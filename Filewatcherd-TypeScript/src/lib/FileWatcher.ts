@@ -54,15 +54,18 @@ export class FileWatcher {
 
     private readonly _clientUuid: string;
 
+    private readonly _notifyCallBack: () => void;
+
     private _disposed: boolean = false;
 
-    constructor(urlParam: string, internalWatchService: IWatchService, externalWatchService: IWatchService,
+    constructor(urlParam: string, internalWatchService: IWatchService, externalWatchService: IWatchService, notifyCallBack: () => void,
                 clientUuid: string) {
 
         this._clientUuid = clientUuid;
 
         this._internalWatchService = internalWatchService;
         this._internalWatchService.setParent(this);
+        this._notifyCallBack = notifyCallBack;
 
         // _externalWS may be null, as it is optional; only _internalWS is required.
         this._externalWatchService = externalWatchService;
@@ -254,6 +257,8 @@ export class FileWatcher {
         const backoffUtil = ExponentialBackoffUtil.getDefaultBackoffUtil(4000);
 
         let sendSuccess = false;
+
+        if (this._notifyCallBack) {this._notifyCallBack;}
 
         while (!sendSuccess) {
 

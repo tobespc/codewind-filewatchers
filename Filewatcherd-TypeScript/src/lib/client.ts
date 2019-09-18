@@ -28,7 +28,7 @@ import { WatchService } from "./WatchService";
  * @param logDir - Directory to write logs to, by default ~/.codewind.
  */
 export default async function createWatcher(codewindURL: string, logDir?: string,
-                                            externalWatchService?: IWatchService): Promise<FileWatcher> {
+                                            externalWatchService?: IWatchService, notifyCallBack?: () => void): Promise<FileWatcher> {
 
     // Default log level
     let logLevel = log.LogLevel.INFO;
@@ -65,7 +65,7 @@ export default async function createWatcher(codewindURL: string, logDir?: string
 
     const clientUuid = crypto.randomBytes(16).toString("hex");
 
-    const fw = new FileWatcher(codewindURL, watchService, (externalWatchService) ? externalWatchService : null,
+    const fw = new FileWatcher(codewindURL, watchService, (externalWatchService) ? externalWatchService : null, (notifyCallBack) ? notifyCallBack : null,
         clientUuid);
 
     return fw;
