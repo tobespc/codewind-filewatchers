@@ -58,8 +58,8 @@ export class FileWatcher {
 
     private _disposed: boolean = false;
 
-    constructor(urlParam: string, internalWatchService: IWatchService, externalWatchService: IWatchService, notifyCallBack: () => void,
-                clientUuid: string) {
+    constructor(urlParam: string, internalWatchService: IWatchService, externalWatchService: IWatchService,
+                notifyCallBack: () => void, clientUuid: string) {
 
         this._clientUuid = clientUuid;
 
@@ -258,7 +258,9 @@ export class FileWatcher {
 
         let sendSuccess = false;
 
-        if (this._notifyCallBack) {this._notifyCallBack;}
+        if (this._notifyCallBack) {
+            this._notifyCallBack();
+        }
 
         while (!sendSuccess) {
 
