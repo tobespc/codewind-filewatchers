@@ -54,18 +54,17 @@ export class FileWatcher {
 
     private readonly _clientUuid: string;
 
-    private readonly _notifyCallBack: () => void;
+    private _connectionCallBack: any;
 
     private _disposed: boolean = false;
 
     constructor(urlParam: string, internalWatchService: IWatchService, externalWatchService: IWatchService,
-                notifyCallBack: () => void, clientUuid: string) {
+                clientUuid: string) {
 
         this._clientUuid = clientUuid;
 
         this._internalWatchService = internalWatchService;
         this._internalWatchService.setParent(this);
-        this._notifyCallBack = notifyCallBack;
 
         // _externalWS may be null, as it is optional; only _internalWS is required.
         this._externalWatchService = externalWatchService;
@@ -90,6 +89,10 @@ export class FileWatcher {
         this._webSocketManager.queueEstablishConnection();
 
         const debugTimer = new DebugTimer(this);
+    }
+
+    public setNotifyCallBack(notifyCallBack: (projectID: string) => void) {
+        this._connectionCallBack = notifyCallBack;
     }
 
     public updateFileWatchStateFromGetRequest(projectsToWatch: ProjectToWatch[]) {
@@ -253,14 +256,9 @@ export class FileWatcher {
      */
     public async sendWatchResponseAsync(successParam: boolean, ptw: ProjectToWatch): Promise<void> {
         if (this._disposed) { return; }
-
         const backoffUtil = ExponentialBackoffUtil.getDefaultBackoffUtil(4000);
 
         let sendSuccess = false;
-
-        if (this._notifyCallBack) {
-            this._notifyCallBack();
-        }
 
         while (!sendSuccess) {
 
@@ -274,6 +272,8 @@ export class FileWatcher {
                 resolveWithFullResponse: true,
                 timeout: 20000,
             };
+
+            await this._connectionCallBack(ptw.projectId);
 
             const url = this._baseUrl + "/api/v1/projects/" + ptw.projectId + "/file-changes/"
                 + ptw.projectWatchStateId + "/status?clientUuid=" + this._clientUuid;
