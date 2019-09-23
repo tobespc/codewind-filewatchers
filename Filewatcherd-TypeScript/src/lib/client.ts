@@ -67,7 +67,7 @@ export default async function createWatcher(codewindURL: string, logDir?: string
     const clientUuid = crypto.randomBytes(16).toString("hex");
 
     const fw = new FileWatcher(codewindURL, watchService, (externalWatchService) ? externalWatchService : null,
-                                (notifyCallBack) ? notifyCallBack : null, clientUuid);
+                                clientUuid);
 
     return fw;
 }

@@ -221,7 +221,8 @@ export class FileWatcher {
         }
     }
 
-    public sendBulkFileChanges(projectId: string, mostRecentEntryTimestamp: number, base64Compressed: string[]) {
+    public async sendBulkFileChanges(projectId: string, mostRecentEntryTimestamp: number, base64Compressed: string[]) {
+        await this._connectionCallBack(projectId);
         if (this._disposed) { return; }
 
         this._outputQueue.addToQueue(projectId, mostRecentEntryTimestamp, base64Compressed);
@@ -255,6 +256,7 @@ export class FileWatcher {
      * and keeps trying until the request succeeds.
      */
     public async sendWatchResponseAsync(successParam: boolean, ptw: ProjectToWatch): Promise<void> {
+        await this._connectionCallBack(ptw.projectId );
         if (this._disposed) { return; }
         const backoffUtil = ExponentialBackoffUtil.getDefaultBackoffUtil(4000);
 
@@ -272,8 +274,6 @@ export class FileWatcher {
                 resolveWithFullResponse: true,
                 timeout: 20000,
             };
-
-            await this._connectionCallBack(ptw.projectId);
 
             const url = this._baseUrl + "/api/v1/projects/" + ptw.projectId + "/file-changes/"
                 + ptw.projectWatchStateId + "/status?clientUuid=" + this._clientUuid;

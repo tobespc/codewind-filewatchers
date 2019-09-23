@@ -136,6 +136,8 @@ export class FileChangeEventBatchUtil {
 
         const mostRecentTimestamp = entries[entries.length - 1];
 
+        log.error("[TOBES} {TOBES}");
+
         const eventSummary = this.generateChangeListSummaryForDebug(entries);
         log.info("Batch change summary for " + this._projectId + " @ "
             + mostRecentTimestamp.timestamp + ": " + eventSummary);
